@@ -81,7 +81,6 @@ build-backend = "poetry.core.masonry.api"
         result = conftest._read_pyproject(key)
         assert result == expected
 
-
     @pytest.mark.parametrize(
         "x, expected",
         [

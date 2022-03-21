@@ -31,6 +31,7 @@ def _read_pyproject(key):
                 if key == line[:len(key)]:
                     return re.search(r'".*"', line).group()[1:-1]
 
+
 def _parse_content(x):
     """
     文字列から改行および冒頭の複数スペースを削除する
