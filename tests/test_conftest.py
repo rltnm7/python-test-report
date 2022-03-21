@@ -1,4 +1,5 @@
 import pytest
+from io import StringIO
 from py.xml import html
 from tests import conftest
 
@@ -46,6 +47,40 @@ class TestConftest:
     -------
     expect string
     """
+
+    input_pyproject = """[tool.poetry]
+name = "test-pyhon-test-report"
+version = "1.2.3"
+description = ""
+authors = ["rltnm7 <rltnm7@gmail.com>"]
+packages = [
+    { include = "src" }
+]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+"""
+
+    @pytest.mark.parametrize(
+        "key, expected",
+        [
+            ("version", "1.2.3"),
+            ("name", "test-pyhon-test-report"),
+        ],
+        ids=enclose_dq
+    )
+    def test_read_pyproject(self, mocker, key, expected):
+        mocked_open = mocker.patch("builtins.open")
+        mocked_open.return_value = StringIO(self.input_pyproject)
+        result = conftest._read_pyproject(key)
+        assert result == expected
+
 
     @pytest.mark.parametrize(
         "x, expected",
@@ -166,7 +201,7 @@ class TestConftest:
         result = conftest._convert_column(attr, report)
         assert result == expected
 
-    def test_pytest_html_report_title(self):
+    def test_pytest_html_report_title(self, mocker):
         """
         pytest_html_report_title
 
@@ -179,10 +214,14 @@ class TestConftest:
                 self.title = None
 
         report = MockTestReport()
-        conftest.pytest_html_report_title(report)
-        assert report.title == "pythontest"
 
-    def test_pytest_configure(self):
+        mocked_open = mocker.patch("builtins.open")
+        mocked_open.return_value = StringIO(self.input_pyproject)
+
+        conftest.pytest_html_report_title(report)
+        assert report.title == "test-pyhon-test-report"
+
+    def test_pytest_configure(self, mocker):
         """
         pytest_configure
 
@@ -195,8 +234,12 @@ class TestConftest:
                 self._metadata = {}
 
         config = MockConfig()
+
+        mocked_open = mocker.patch("builtins.open")
+        mocked_open.return_value = StringIO(self.input_pyproject)
+
         conftest.pytest_configure(config)
-        assert config._metadata["Version"] == "0.0.1"
+        assert config._metadata["Version"] == "1.2.3"
 
     def test_pytest_html_results_table_header(self):
         """

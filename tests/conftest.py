@@ -1,13 +1,35 @@
 from py.xml import html
+import os
 import pytest
 import re
 from pytest_flake8 import Flake8Item
 
 
+PROJECT_FILENAME = "pyproject.toml"
 REPORT_COLUMNS = ["Descriptions", "Inputs", "Expects"]
 PARAMETRIZE_MARKER = "@pytest.mark.parametrize"
 PARAMETRIZE_MARKER_LENGTH = len(PARAMETRIZE_MARKER)
 
+
+def _read_pyproject(key):
+    """
+    pyproject.tomlからkeyに該当するvalueを取得する
+
+    Parameters
+    ----------
+    key: string
+        読み取りデータのkey
+
+    Returns
+    -------
+    string
+        読み取りデータ
+    """
+    if os.path.exists(PROJECT_FILENAME):
+        with open(PROJECT_FILENAME, "r") as f:
+            for line in f.readlines():
+                if key == line[:len(key)]:
+                    return re.search(r'".*"', line).group()[1:-1]
 
 def _parse_content(x):
     """
@@ -118,7 +140,7 @@ def pytest_configure(config):
     pytest.hookspec.pytest_configure:
         https://docs.pytest.org/en/6.2.x/reference.html#pytest.hookspec.pytest_configure
     """
-    config._metadata["Version"] = "0.0.1"
+    config._metadata["Version"] = _read_pyproject("version")
 
 
 def pytest_html_report_title(report):
@@ -130,7 +152,7 @@ def pytest_html_report_title(report):
     report : _pytest.reports.TestReport
         pytestが生成するレポートオブジェクト
     """
-    report.title = "pythontest"
+    report.title = _read_pyproject("name")
 
 
 def pytest_html_results_table_header(cells):
