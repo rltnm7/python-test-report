@@ -1,0 +1,25 @@
+[tool.poetry]
+name = "pyhon-test-report"
+version = "0.1.0"
+description = ""
+authors = ["rltnm7 <rltnm7@gmail.com>"]
+packages = [
+    { include = "src" }
+]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+
+[tool.poetry.dev-dependencies]
+flake8 = "^4.0.1"
+pep8-naming = "^0.12.1"
+flake8-cognitive-complexity = "^0.1.0"
+pytest = "^7.1.1"
+pytest-mock = "^3.7.0"
+pytest-cov = "^3.0.0"
+pytest-flake8 = "^1.1.1"
+pytest-html = "^3.1.1"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
